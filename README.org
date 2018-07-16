@@ -44,25 +44,44 @@
 
   - This...
 
-  | Head Fixation Rig | COLOR | ACTUATORS DB-25 | Stepper Controller | COLOR |
-  |-------------------+-------+-----------------+--------------------+-------|
-  | MOTOR 0           | BLACK |              12 | MOTOR 0 A+         | BLACK |
-  | MOTOR 0           | GREEN |              11 | MOTOR 0 A-         | GREEN |
-  | MOTOR 0           | RED   |              10 | MOTOR 0 B+         | RED   |
-  | MOTOR 0           | BLUE  |               9 | MOTOR 0 B-         | WHITE |
-  | MOTOR 1           | BLACK |               8 | MOTOR 1 A+         | BLACK |
-  | MOTOR 1           | GREEN |               7 | MOTOR 1 A-         | GREEN |
-  | MOTOR 1           | RED   |               6 | MOTOR 1 B+         | RED   |
-  | MOTOR 1           | BLUE  |               5 | MOTOR 1 B-         | WHITE |
+  | Head Fixation Rig | COLOR | ACTUATORS DB-25 | Head Fixation Controller | COLOR |
+  |-------------------+-------+-----------------+--------------------------+-------|
+  | MOTOR 0           | BLACK |              12 | MOTOR 0 A+               | BLACK |
+  | MOTOR 0           | GREEN |              11 | MOTOR 0 A-               | GREEN |
+  | MOTOR 0           | RED   |              10 | MOTOR 0 B+               | RED   |
+  | MOTOR 0           | BLUE  |               9 | MOTOR 0 B-               | WHITE |
+  | MOTOR 1           | BLACK |               8 | MOTOR 1 A+               | BLACK |
+  | MOTOR 1           | GREEN |               7 | MOTOR 1 A-               | GREEN |
+  | MOTOR 1           | RED   |               6 | MOTOR 1 B+               | RED   |
+  | MOTOR 1           | BLUE  |               5 | MOTOR 1 B-               | WHITE |
 
-  | Head Fixation Rig | COLOR  | SENSORS DB-25 | Stepper Controller | COLOR  |
-  |-------------------+--------+---------------+--------------------+--------|
-  | MOTOR 0 HOME COM  | YELLOW |            21 | MOTOR 0 GND        | WHITE  |
-  | MOTOR 0 HOME NC   | ORANGE |            20 | MOTOR 0 REF        | BROWN  |
-  | MOTOR 1 HOME COM  | YELLOW |            19 | MOTOR 1 GND        | RED    |
-  | MOTOR 1 HOME NC   | ORANGE |            18 | MOTOR 1 REF        | ORANGE |
-  | HEADBAR SWITCH A  | PURPLE |             5 | BTN B +            | GREEN  |
-  | HEADBAR SWITCH B  | PURPLE |             6 | BTN B -            | BLUE   |
+  | Head Fixation Rig      | COLOR  | SENSORS DB-25 | Head Fixation Controller | COLOR |
+  |------------------------+--------+---------------+--------------------------+-------|
+  | MOTOR 0 HOME COM       | YELLOW |            21 | SWITCH 0 GND             | BLACK |
+  | MOTOR 0 HOME NC        | ORANGE |            20 | SWITCH 0 DI              | WHITE |
+  | MOTOR 1 HOME COM       | YELLOW |            19 | SWITCH 1 GND             | BLACK |
+  | MOTOR 1 HOME NC        | ORANGE |            18 | SWITCH 1 DI              | WHITE |
+  | HEADBAR SWITCH B       | PURPLE |             6 | SWITCH 2 GND             | BLACK |
+  | HEADBAR SWITCH A       | PURPLE |             5 | SWITCH 2 DI              | WHITE |
+  | VoltageRatioInput GND  | BLACK  |            16 | LOAD CELL GND            | BLACK |
+  | VoltageRatioInput 5V   | RED    |            15 | LOAD CELL 5V             | RED   |
+  | VoltageRatioInput DATA | WHITE  |            14 | LOAD CELL DATA           | WHITE |
+
+  | Head Fixation Rig | COLOR | Phidgets Voltage Ratio Input |
+  |-------------------+-------+------------------------------|
+  | LOAD CELL +5V     | RED   | INPUT 0 5V                   |
+  | LOAD CELL +       | GREEN | INPUT 0 +                    |
+  | LOAD CELL -       | WHITE | INPUT 0 -                    |
+  | LOAD CELL GROUND  | BLACK | INPUT 0 G                    |
+
+ | PhidgetSBC4 | Head Fixation Controller |
+ |-------------+--------------------------|
+ | VINT 0      | MOTOR 0                  |
+ | VINT 1      | SWITCH 0                 |
+ | VINT 2      | MOTOR 1                  |
+ | VINT 3      | SWITCH 1                 |
+ | VINT 4      | SWITCH 2                 |
+ | VINT 5      | LOAD CELL                |
 
   | ACTUATORS DB-25 Rig | ACTUATORS DB-25 Controller |
   |---------------------+----------------------------|
