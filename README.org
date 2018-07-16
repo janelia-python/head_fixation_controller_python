@@ -1,0 +1,41 @@
+#+TITLE: head_fixation_controller_python
+#+AUTHOR: Peter Polidoro
+#+EMAIL: peterpolidoro@gmail.com
+
+* Package Information
+  - Author :: Peter Polidoro
+  - License :: BSD
+
+  This Python package (head_fixation_controller) creates a class named
+  HeadFixationController.
+
+* Example Usage
+
+
+  #+BEGIN_SRC python
+    from head_fixation_controller import HeadFixationController
+    dev = HeadFixationController() # Might automatically find devices if available
+  #+END_SRC
+
+* Installation
+
+  [[https://github.com/janelia-pypi/python_setup][Setup Python]]
+
+** Linux and Mac OS X
+
+   #+BEGIN_SRC sh
+     mkdir -p ~/virtualenvs/head_fixation_controller
+     virtualenv ~/virtualenvs/head_fixation_controller
+     #Python3
+     virtualenv -p python3 ~/virtualenvs/head_fixation_controller
+     source ~/virtualenvs/head_fixation_controller/bin/activate
+     pip install head_fixation_controller
+   #+END_SRC
+
+** Windows
+
+   #+BEGIN_SRC sh
+     virtualenv C:\virtualenvs\head_fixation_controller
+     C:\virtualenvs\head_fixation_controller\Scripts\activate
+     pip install head_fixation_controller
+   #+END_SRC
