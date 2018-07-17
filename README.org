@@ -74,14 +74,19 @@
   | LOAD CELL -       | WHITE | INPUT 0 -                    |
   | LOAD CELL GROUND  | BLACK | INPUT 0 G                    |
 
- | PhidgetSBC4 | Head Fixation Controller |
- |-------------+--------------------------|
- | VINT 0      | MOTOR 0                  |
- | VINT 1      | SWITCH 0                 |
- | VINT 2      | MOTOR 1                  |
- | VINT 3      | SWITCH 1                 |
- | VINT 4      | SWITCH 2                 |
- | VINT 5      | LOAD CELL                |
+  | PhidgetSBC4 | Head Fixation Controller |
+  |-------------+--------------------------|
+  | VINT 0      | MOTOR 0                  |
+  | VINT 1      | SWITCH 0                 |
+  | VINT 2      | MOTOR 1                  |
+  | VINT 3      | SWITCH 1                 |
+  | VINT 4      | SWITCH 2                 |
+  | VINT 5      | LOAD CELL                |
+  | USB         | VINT Hub Phidget         |
+
+  | VINT Hub Phidget | Head Fixation Controller |
+  |------------------+--------------------------|
+  | VINT 0           | SWITCH 3                 |
 
   | ACTUATORS DB-25 Rig | ACTUATORS DB-25 Controller |
   |---------------------+----------------------------|
