@@ -11,7 +11,6 @@
 
 * Example Usage
 
-
   #+BEGIN_SRC python
     from head_fixation_controller import HeadFixationController
     dev = HeadFixationController() # Might automatically find devices if available
@@ -19,30 +18,19 @@
 
 * Installation
 
-  [[https://github.com/janelia-pypi/python_setup][Setup Python]]
+** Setup PhidgetSBC
 
-** Linux and Mac OS X
+   [[https://github.com/janelia-experimental-technology/phidgets_setup]]
 
-   #+BEGIN_SRC sh
-     mkdir -p ~/virtualenvs/head_fixation_controller
-     virtualenv ~/virtualenvs/head_fixation_controller
-     #Python3
-     virtualenv -p python3 ~/virtualenvs/head_fixation_controller
-     source ~/virtualenvs/head_fixation_controller/bin/activate
-     pip install head_fixation_controller
-   #+END_SRC
+** Test Phidget Python Module
 
-** Windows
-
-   #+BEGIN_SRC sh
-     virtualenv C:\virtualenvs\head_fixation_controller
-     C:\virtualenvs\head_fixation_controller\Scripts\activate
-     pip install head_fixation_controller
-   #+END_SRC
+  #+BEGIN_SRC sh
+    ssh root@phidgetsbc.local
+    cd ~/Downloads
+    wget https://www.phidgets.com/downloads/phidget22/examples/python/DigitalInput/Phidget22_DigitalInput_Python_Ex.zip
+  #+END_SRC
 
 * Build Instructions
-
-  - This...
 
   | Head Fixation Rig | COLOR | ACTUATORS DB-25 | Head Fixation Controller | COLOR |
   |-------------------+-------+-----------------+--------------------------+-------|
