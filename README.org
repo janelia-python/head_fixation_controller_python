@@ -22,19 +22,23 @@
 
    [[https://github.com/janelia-experimental-technology/phidgets_setup]]
 
-** Test Phidget Python Module
+** Clone This Repository
 
   #+BEGIN_SRC sh
     ssh root@phidgetsbc.local
-    cd ~/Downloads
-    wget https://www.phidgets.com/downloads/phidget22/examples/python/DigitalInput/Phidget22_DigitalInput_Python_Ex.zip
+    mkdir ~/git
+    cd ~/git
+    git clone https://github.com/janelia-pypi/head_fixation_controller_python.git
   #+END_SRC
 
 ** Update Phidgets Configuration File
 
-   Update device_serial_numbers in:
+   Update phidget device_serial_numbers in "phidgets.json" file.
 
-   [[./phidgets.json]]
+  #+BEGIN_SRC sh
+    ssh root@phidgetsbc.local
+    cd ~/git/head_fixation_controller_python/
+  #+END_SRC
 
 * Hardware
 
