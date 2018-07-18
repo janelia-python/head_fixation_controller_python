@@ -38,7 +38,7 @@
     "label" : "LOAD CELL",
     "channel_class" : "VoltageRatioInput",
     "device_serial_number" : 514010,
-    "hub_port" : 3,
+    "hub_port" : 5,
     "channel" : 0
   },
   "release_switch" : {
