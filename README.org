@@ -30,7 +30,11 @@
     wget https://www.phidgets.com/downloads/phidget22/examples/python/DigitalInput/Phidget22_DigitalInput_Python_Ex.zip
   #+END_SRC
 
-* Build Instructions
+* Hardware
+
+** Actuators
+
+*** Head Fixation Rig <-> Connector <-> Head Fixation Controller
 
   | Head Fixation Rig | COLOR | ACTUATORS DB-25 | Head Fixation Controller | COLOR |
   |-------------------+-------+-----------------+--------------------------+-------|
@@ -42,6 +46,25 @@
   | MOTOR 1           | GREEN |               7 | MOTOR 1 A-               | GREEN |
   | MOTOR 1           | RED   |               6 | MOTOR 1 B+               | RED   |
   | MOTOR 1           | BLUE  |               5 | MOTOR 1 B-               | WHITE |
+
+*** Connector Polarity
+
+  | ACTUATORS DB-25 Rig | ACTUATORS DB-25 Controller |
+  |---------------------+----------------------------|
+  | MALE PINS           | FEMALE SOCKETS             |
+
+** Sensors
+
+*** Head Fixation Rig <-> Load Cell
+
+  | Head Fixation Rig | COLOR | Phidgets Voltage Ratio Input |
+  |-------------------+-------+------------------------------|
+  | LOAD CELL +5V     | RED   | INPUT 0 5V                   |
+  | LOAD CELL +       | GREEN | INPUT 0 +                    |
+  | LOAD CELL -       | WHITE | INPUT 0 -                    |
+  | LOAD CELL GROUND  | BLACK | INPUT 0 G                    |
+
+*** Head Fixation Rig <-> Connector <-> Head Fixation Controller
 
   | Head Fixation Rig      | COLOR  | SENSORS DB-25 | Head Fixation Controller | COLOR |
   |------------------------+--------+---------------+--------------------------+-------|
@@ -55,12 +78,15 @@
   | VoltageRatioInput 5V   | RED    |            15 | LOAD CELL 5V             | RED   |
   | VoltageRatioInput DATA | WHITE  |            14 | LOAD CELL DATA           | WHITE |
 
-  | Head Fixation Rig | COLOR | Phidgets Voltage Ratio Input |
-  |-------------------+-------+------------------------------|
-  | LOAD CELL +5V     | RED   | INPUT 0 5V                   |
-  | LOAD CELL +       | GREEN | INPUT 0 +                    |
-  | LOAD CELL -       | WHITE | INPUT 0 -                    |
-  | LOAD CELL GROUND  | BLACK | INPUT 0 G                    |
+*** Connector Polarity
+
+  | SENSORS DB-25 Rig | SENSORS DB-25 Controller |
+  |-------------------+--------------------------|
+  | FEMALE SOCKETS    | MALE PINS                |
+
+** Head Fixation Controller
+
+*** Single Board Computer
 
   | PhidgetSBC4 | Head Fixation Controller |
   |-------------+--------------------------|
@@ -72,14 +98,8 @@
   | VINT 5      | LOAD CELL                |
   | USB         | VINT Hub Phidget         |
 
+*** VINT Hub
+
   | VINT Hub Phidget | Head Fixation Controller |
   |------------------+--------------------------|
   | VINT 0           | SWITCH 3                 |
-
-  | ACTUATORS DB-25 Rig | ACTUATORS DB-25 Controller |
-  |---------------------+----------------------------|
-  | MALE PINS           | FEMALE SOCKETS             |
-
-  | SENSORS DB-25 Rig | SENSORS DB-25 Controller |
-  |-------------------+--------------------------|
-  | FEMALE SOCKETS    | MALE PINS                |
