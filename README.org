@@ -30,6 +30,12 @@
     wget https://www.phidgets.com/downloads/phidget22/examples/python/DigitalInput/Phidget22_DigitalInput_Python_Ex.zip
   #+END_SRC
 
+** Update Phidgets Configuration File
+
+   Update device_serial_numbers in:
+
+   [[./phidgets.json]]
+
 * Hardware
 
 ** Actuators
