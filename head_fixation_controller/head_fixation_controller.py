@@ -53,6 +53,7 @@ class HeadFixationController():
             try:
                 if (phidget_configuration['channel_class'] == 'DigitalInput'):
                     self._phidgets.update({name : DigitalInput()})
+                    self._phidgets[name].setIsHubPortDevice(True)
                 elif (phidget_configuration['channel_class'] == 'Stepper'):
                     self._phidgets.update({name : Stepper()})
                 elif (phidget_configuration['channel_class'] == 'VoltageRatioInput'):
@@ -83,6 +84,10 @@ class HeadFixationController():
             print(phidget.name,' current_limit: ',phidget.getCurrentLimit())
             phidget.setVelocityLimit(phidget.configuration['velocity_limit'])
             print(phidget.name,' velocity_limit: ',phidget.getVelocityLimit())
+            phidget.setEngaged(True)
+            print(phidget.name,' position: ',phidget.getPosition())
+            phidget.setTargetPosition(phidget.configuration['latch_position'])
+            print(phidget.name,' position: ',phidget.getPosition())
         elif phidget.configuration['channel_class'] == 'VoltageRatioInput':
             print('yes voltage thingy!')
             print(phidget.configuration)
