@@ -33,11 +33,11 @@
 
 ** Update Phidgets Configuration File
 
-   Update phidget device_serial_numbers in "phidgets.json" file.
+   Update phidget device_serial_numbers in "head_fixation_controller/phidgets.json" file.
 
   #+BEGIN_SRC sh
     ssh root@phidgetsbc.local
-    cd ~/git/head_fixation_controller_python/
+    cd ~/git/head_fixation_controller_python/head_fixation_controller/
   #+END_SRC
 
 * Hardware

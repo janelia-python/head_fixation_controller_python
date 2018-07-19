@@ -5,6 +5,7 @@ from Phidget22.Net import *
 from Phidget22.Devices.Stepper import *
 from Phidget22.Devices.DigitalInput import *
 from Phidget22.Devices.VoltageRatioInput import *
+import os
 
 try:
     from pkg_resources import get_distribution, DistributionNotFound
@@ -32,32 +33,37 @@ class HeadFixationController():
     dev = HeadFixationController() # Might automatically find devices if available
     '''
 
-    _PHIDGETS_CONFIGURATION_FILENAME = "phidgets.json"
+    _PHIDGETS_CONFIGURATION_FILENAME = 'phidgets.json'
 
     def __init__(self,*args,**kwargs):
         if 'debug' in kwargs:
             self.debug = kwargs['debug']
 
-        with open(self._PHIDGETS_CONFIGURATION_FILENAME) as f:
+        module_dir = os.path.split(__file__)[0]
+        phidgets_configuration_path = os.path.join(module_dir,self._PHIDGETS_CONFIGURATION_FILENAME)
+        print(phidgets_configuration_path)
+
+        with open(phidgets_configuration_path) as f:
             phidgets_configuration_json = f.read()
 
-        self._phidgets_configuration = json.loads(phidgets_configuration_json)
+        phidgets_configuration = json.loads(phidgets_configuration_json)
 
         self._phidgets = {}
-        for name, phidget_configuration in self._phidgets_configuration.items():
+        for name, phidget_configuration in phidgets_configuration.items():
             try:
-                if (phidget_configuration["channel_class"] == "Stepper"):
-                    self._phidgets.update({name : Stepper()})
-                elif (phidget_configuration["channel_class"] == "DigitalInput"):
+                if (phidget_configuration['channel_class'] == 'DigitalInput'):
                     self._phidgets.update({name : DigitalInput()})
-                elif (phidget_configuration["channel_class"] == "VoltageRatioInput"):
+                elif (phidget_configuration['channel_class'] == 'Stepper'):
+                    self._phidgets.update({name : Stepper()})
+                elif (phidget_configuration['channel_class'] == 'VoltageRatioInput'):
                     self._phidgets.update({name : VoltageRatioInput()})
                 else:
                     break
                 self._phidgets[name].name = name
-                self._phidgets[name].setDeviceSerialNumber(phidget_configuration["device_serial_number"])
-                self._phidgets[name].setHubPort(phidget_configuration["hub_port"])
-                self._phidgets[name].setChannel(phidget_configuration["channel"])
+                self._phidgets[name].configuration = phidget_configuration
+                self._phidgets[name].setDeviceSerialNumber(phidget_configuration['device_serial_number'])
+                self._phidgets[name].setHubPort(phidget_configuration['hub_port'])
+                self._phidgets[name].setChannel(phidget_configuration['channel'])
                 self._phidgets[name].setOnAttachHandler(self._phidget_attached)
                 self._phidgets[name].open()
             except KeyError:
@@ -66,8 +72,20 @@ class HeadFixationController():
         for name, phidget in self._phidgets.items():
             print(name, phidget.name, phidget.getAttached())
 
-    def _phidget_attached(self,attached):
-        print(attached.getChannelName())
+    def _phidget_attached(self,phidget):
+        if phidget.configuration['channel_class'] == 'Stepper':
+            print()
+            phidget.setAcceleration(phidget.configuration['acceleration'])
+            print(phidget.name,' acceleration: ',phidget.getAcceleration())
+            phidget.setControlMode(phidget.configuration['control_mode'])
+            print(phidget.name,' control_mode: ',phidget.getControlMode())
+            phidget.setCurrentLimit(phidget.configuration['current_limit'])
+            print(phidget.name,' current_limit: ',phidget.getCurrentLimit())
+            phidget.setVelocityLimit(phidget.configuration['velocity_limit'])
+            print(phidget.name,' velocity_limit: ',phidget.getVelocityLimit())
+        elif phidget.configuration['channel_class'] == 'VoltageRatioInput':
+            print('yes voltage thingy!')
+            print(phidget.configuration)
 
 # -----------------------------------------------------------------------------------------
 if __name__ == '__main__':
