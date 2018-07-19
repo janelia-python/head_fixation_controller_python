@@ -24,6 +24,20 @@ else:
 
 DEBUG = False
 
+class LatchController():
+    '''
+    LatchController.
+    '''
+
+    def __init__(self,*args,**kwargs):
+        pass
+
+    def setStepper(self,stepper):
+        self.stepper = stepper
+
+    def setHomeSwitch(self,home_switch):
+        self.home_switch = home_switch
+
 class HeadFixationController():
     '''
     HeadFixationController.
@@ -84,13 +98,20 @@ class HeadFixationController():
             print(phidget.name,' current_limit: ',phidget.getCurrentLimit())
             phidget.setVelocityLimit(phidget.configuration['velocity_limit'])
             print(phidget.name,' velocity_limit: ',phidget.getVelocityLimit())
-            phidget.setEngaged(True)
-            print(phidget.name,' position: ',phidget.getPosition())
-            phidget.setTargetPosition(phidget.configuration['latch_position'])
-            print(phidget.name,' position: ',phidget.getPosition())
+            # phidget.setEngaged(True)
+            # print(phidget.name,' position: ',phidget.getPosition())
+            # phidget.setTargetPosition(phidget.configuration['latch_position'])
+            # print(phidget.name,' position: ',phidget.getPosition())
         elif phidget.configuration['channel_class'] == 'VoltageRatioInput':
             print('yes voltage thingy!')
             print(phidget.configuration)
+
+    def all_phidgets_attached(self):
+        for phidget in self._phidgets.values():
+            if not phidget.getAttached():
+                return False
+        return True
+
 
 # -----------------------------------------------------------------------------------------
 if __name__ == '__main__':
