@@ -1,13 +1,13 @@
 {
-  "right_head_latch" : {
+  "right_head_latch_motor" : {
     "label" : "MOTOR 0",
     "channel_class" : "Stepper",
     "device_serial_number" : 514010,
     "hub_port" : 0,
     "channel" : 0,
-    "latch_position" : -1100,
+    "close_position" : -1100,
+    "home_velocity" : 500,
     "acceleration" : 1000,
-    "control_mode" : 0,
     "current_limit" : 0.25,
     "velocity_limit" : 1000
   },
@@ -18,15 +18,15 @@
     "hub_port" : 1,
     "channel" : 0
   },
-  "left_head_latch" : {
+  "left_head_latch_motor" : {
     "label" : "MOTOR 1",
     "channel_class" : "Stepper",
     "device_serial_number" : 514010,
     "hub_port" : 2,
     "channel" : 0,
-    "latch_position" : 1100,
+    "close_position" : 1100,
+    "home_velocity" : -500,
     "acceleration" : 1000,
-    "control_mode" : 0,
     "current_limit" : 0.25,
     "velocity_limit" : 1000
   },
@@ -44,7 +44,7 @@
     "hub_port" : 4,
     "channel" : 0
   },
-  "mouse_force_sensor" : {
+  "floor_force_sensor" : {
     "label" : "LOAD CELL",
     "channel_class" : "VoltageRatioInput",
     "device_serial_number" : 514010,

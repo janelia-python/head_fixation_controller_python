@@ -24,19 +24,72 @@ else:
 
 DEBUG = False
 
-class LatchController():
+class Latch():
     '''
-    LatchController.
+    Latch.
     '''
+    _CONTROL_MODE_STEP = 0
+    _CONTROL_MODE_RUN = 1
+    _HOME_SWITCH_ACTIVE = 0
+    _HOME_SWITCH_INACTIVE = 1
 
     def __init__(self,*args,**kwargs):
-        pass
+        self._homed = False
 
-    def setStepper(self,stepper):
+    def set_stepper(self,stepper):
         self.stepper = stepper
 
-    def setHomeSwitch(self,home_switch):
+    def set_home_switch(self,home_switch):
         self.home_switch = home_switch
+        self.home_switch.setOnStateChangeHandler(self._home_switch_handler)
+
+    def all_attached(self):
+        if not self.stepper.getAttached():
+            return False
+        if not self.home_switch.getAttached():
+            return False
+        return True
+
+    def _home_switch_handler(self,phidget,state):
+        if not self.all_attached():
+            return
+        self.stop()
+        self.stepper.setControlMode(self._CONTROL_MODE_STEP)
+        offset = self.stepper.getPosition()
+        self.stepper.addPositionOffset(-offset)
+        self.stepper.setTargetPosition(0)
+        self.stepper.setVelocityLimit(self.stepper.configuration['velocity_limit'])
+        self._homed = True
+
+    def home(self):
+        if not self.all_attached():
+            print("not all attached!")
+            return
+        if self.home_switch_active():
+            self._home_switch_handler()
+            return
+        self.stepper.setEngaged(False)
+        self._homed = False
+        self.stepper.setControlMode(self._CONTROL_MODE_RUN)
+        self.stepper.setVelocityLimit(self.stepper.configuration['home_velocity'])
+        self.stepper.setEngaged(True)
+
+    def stop(self):
+        self.stepper.setVelocityLimit(0)
+
+    def close(self):
+        if self._homed:
+            self.stepper.setTargetPosition(self.stepper.configuration['close_position'])
+
+    def open(self):
+        if self._homed:
+            self.stepper.setTargetPosition(0)
+        else:
+            self.home()
+
+    def home_switch_active(self):
+        return self.home_switch.getState() == self._HOME_SWITCH_ACTIVE
+
 
 class HeadFixationController():
     '''
@@ -52,10 +105,11 @@ class HeadFixationController():
     def __init__(self,*args,**kwargs):
         if 'debug' in kwargs:
             self.debug = kwargs['debug']
+        else:
+            self.debug = DEBUG
 
         module_dir = os.path.split(__file__)[0]
         phidgets_configuration_path = os.path.join(module_dir,self._PHIDGETS_CONFIGURATION_FILENAME)
-        print(phidgets_configuration_path)
 
         with open(phidgets_configuration_path) as f:
             phidgets_configuration_json = f.read()
@@ -64,53 +118,57 @@ class HeadFixationController():
 
         self._phidgets = {}
         for name, phidget_configuration in phidgets_configuration.items():
-            try:
-                if (phidget_configuration['channel_class'] == 'DigitalInput'):
-                    self._phidgets.update({name : DigitalInput()})
-                    self._phidgets[name].setIsHubPortDevice(True)
-                elif (phidget_configuration['channel_class'] == 'Stepper'):
-                    self._phidgets.update({name : Stepper()})
-                elif (phidget_configuration['channel_class'] == 'VoltageRatioInput'):
-                    self._phidgets.update({name : VoltageRatioInput()})
-                else:
-                    break
-                self._phidgets[name].name = name
-                self._phidgets[name].configuration = phidget_configuration
-                self._phidgets[name].setDeviceSerialNumber(phidget_configuration['device_serial_number'])
-                self._phidgets[name].setHubPort(phidget_configuration['hub_port'])
-                self._phidgets[name].setChannel(phidget_configuration['channel'])
-                self._phidgets[name].setOnAttachHandler(self._phidget_attached)
-                self._phidgets[name].open()
-            except KeyError:
+            if (phidget_configuration['channel_class'] == 'DigitalInput'):
+                self._phidgets.update({name : DigitalInput()})
+                self._phidgets[name].setIsHubPortDevice(True)
+            elif (phidget_configuration['channel_class'] == 'Stepper'):
+                self._phidgets.update({name : Stepper()})
+            elif (phidget_configuration['channel_class'] == 'VoltageRatioInput'):
+                self._phidgets.update({name : VoltageRatioInput()})
+            else:
                 break
+            self._phidgets[name].name = name
+            self._phidgets[name].configuration = phidget_configuration
+            self._phidgets[name].setDeviceSerialNumber(phidget_configuration['device_serial_number'])
+            self._phidgets[name].setHubPort(phidget_configuration['hub_port'])
+            self._phidgets[name].setChannel(phidget_configuration['channel'])
+            self._phidgets[name].setOnAttachHandler(self._phidget_attached)
+            self._phidgets[name].open()
 
-        for name, phidget in self._phidgets.items():
-            print(name, phidget.name, phidget.getAttached())
+        self.right_head_latch = Latch()
+        self.right_head_latch.set_stepper(self._phidgets['right_head_latch_motor'])
+        self.right_head_latch.set_home_switch(self._phidgets['right_head_latch_home_switch'])
+
+        self.left_head_latch = Latch()
+        self.left_head_latch.set_stepper(self._phidgets['left_head_latch_motor'])
+        self.left_head_latch.set_home_switch(self._phidgets['left_head_latch_home_switch'])
+
+        # for name, phidget in self._phidgets.items():
+        #     self._debug_print(name, phidget.name, phidget.getAttached())
 
     def _phidget_attached(self,phidget):
         if phidget.configuration['channel_class'] == 'Stepper':
-            print()
+            self._debug_print()
+            phidget.setEngaged(False)
             phidget.setAcceleration(phidget.configuration['acceleration'])
-            print(phidget.name,' acceleration: ',phidget.getAcceleration())
-            phidget.setControlMode(phidget.configuration['control_mode'])
-            print(phidget.name,' control_mode: ',phidget.getControlMode())
+            self._debug_print(phidget.name,' acceleration: ',phidget.getAcceleration())
             phidget.setCurrentLimit(phidget.configuration['current_limit'])
-            print(phidget.name,' current_limit: ',phidget.getCurrentLimit())
+            self._debug_print(phidget.name,' current_limit: ',phidget.getCurrentLimit())
             phidget.setVelocityLimit(phidget.configuration['velocity_limit'])
-            print(phidget.name,' velocity_limit: ',phidget.getVelocityLimit())
-            # phidget.setEngaged(True)
-            # print(phidget.name,' position: ',phidget.getPosition())
-            # phidget.setTargetPosition(phidget.configuration['latch_position'])
-            # print(phidget.name,' position: ',phidget.getPosition())
+            self._debug_print(phidget.name,' velocity_limit: ',phidget.getVelocityLimit())
         elif phidget.configuration['channel_class'] == 'VoltageRatioInput':
-            print('yes voltage thingy!')
-            print(phidget.configuration)
+            self._debug_print('yes voltage thingy!')
+            self._debug_print(phidget.configuration)
 
-    def all_phidgets_attached(self):
+    def all_attached(self):
         for phidget in self._phidgets.values():
             if not phidget.getAttached():
                 return False
         return True
+
+    def _debug_print(self, *args):
+        if self.debug:
+            print(*args)
 
 
 # -----------------------------------------------------------------------------------------
