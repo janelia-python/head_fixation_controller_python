@@ -6,10 +6,12 @@
     "hub_port" : 0,
     "channel" : 0,
     "close_position" : -1100,
-    "home_velocity" : 500,
-    "acceleration" : 1000,
-    "current_limit" : 0.25,
-    "velocity_limit" : 1000
+    "release_position" : -10,
+    "home_velocity" : 400,
+    "acceleration" : 2000,
+    "current_limit" : 0.5,
+    "holding_current_limit" : 0.5,
+    "velocity_limit" : 2000
   },
   "right_head_latch_home_switch" : {
     "label" : "SWITCH 0",
@@ -25,10 +27,12 @@
     "hub_port" : 2,
     "channel" : 0,
     "close_position" : 1100,
-    "home_velocity" : -500,
-    "acceleration" : 1000,
-    "current_limit" : 0.25,
-    "velocity_limit" : 1000
+    "release_position" : 10,
+    "home_velocity" : -400,
+    "acceleration" : 2000,
+    "current_limit" : 0.5,
+    "holding_current_limit" : 0.5,
+    "velocity_limit" : 2000
   },
   "left_head_latch_home_switch" : {
     "label" : "SWITCH 1",
