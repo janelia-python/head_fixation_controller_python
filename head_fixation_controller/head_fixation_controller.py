@@ -6,6 +6,7 @@ from Phidget22.Devices.Stepper import *
 from Phidget22.Devices.DigitalInput import *
 from Phidget22.Devices.VoltageRatioInput import *
 import os
+from threading import Timer
 
 try:
     from pkg_resources import get_distribution, DistributionNotFound
@@ -35,7 +36,7 @@ class Latch():
 
     def __init__(self,*args,**kwargs):
         self._homed = False
-        self._homed_or_released_handler = None
+        self._released_handler = None
 
     def set_stepper(self,stepper):
         self.stepper = stepper
@@ -45,8 +46,8 @@ class Latch():
         self.home_switch = home_switch
         self.home_switch.setOnStateChangeHandler(self._home_switch_handler)
 
-    def set_homed_or_released_handler(self,homed_or_released_handler):
-        self._homed_or_released_handler = homed_or_released_handler
+    def set_released_handler(self,released_handler):
+        self._released_handler = released_handler
 
     def _all_attached(self):
         if not self.stepper.getAttached():
@@ -57,8 +58,8 @@ class Latch():
 
     def _stopped_handler(self,phidget):
         if self._at_release_position():
-            if self._homed_or_released_handler is not None:
-                self._homed_or_released_handler()
+            if self._released_handler is not None:
+                self._released_handler()
 
     def _at_home_position(self):
         position = self.stepper.getPosition()
@@ -90,8 +91,8 @@ class Latch():
         self._zero()
         self.stepper.setVelocityLimit(self.stepper.configuration['velocity_limit'])
         self._homed = True
-        if self._homed_or_released_handler is not None:
-            self._homed_or_released_handler()
+        if self._released_handler is not None:
+            self._released_handler()
 
     def _zero(self):
         offset = self.stepper.getPosition()
@@ -112,16 +113,19 @@ class Latch():
         self.stepper.setVelocityLimit(self.stepper.configuration['home_velocity'])
         self.stepper.setEngaged(True)
 
+    def homed(self):
+        return self._homed
+
     def stop(self):
         self.stepper.setVelocityLimit(0)
 
     def close(self):
-        if self._homed:
+        if self.homed():
             if not self._at_close_position():
                 self.stepper.setTargetPosition(self.stepper.configuration['close_position'])
 
     def release(self):
-        if self._homed:
+        if self.homed():
             if not self._at_release_position():
                 self.stepper.setTargetPosition(self.stepper.configuration['release_position'])
         else:
@@ -130,9 +134,7 @@ class Latch():
     def home_switch_active(self):
         return self.home_switch.getState() == self._HOME_SWITCH_ACTIVE
 
-    def homed_or_released(self):
-        if self._at_home_position():
-            return True
+    def released(self):
         if self._at_release_position():
             return True
         return False
@@ -151,8 +153,10 @@ class HeadFixationController():
     _PHIDGETS_CONFIGURATION_FILENAME = 'phidgets.json'
     _HEAD_BAR_SWITCH_ACTIVE = 1
     _RELEASE_SWITCH_ACTIVE = 1
+    _SETUP_PERIOD = 1.0
 
     def __init__(self,*args,**kwargs):
+        self._initialized = False
         if 'debug' in kwargs:
             self.debug = kwargs['debug']
         else:
@@ -188,16 +192,20 @@ class HeadFixationController():
         self.right_head_latch = Latch()
         self.right_head_latch.set_stepper(self._phidgets['right_head_latch_motor'])
         self.right_head_latch.set_home_switch(self._phidgets['right_head_latch_home_switch'])
-        self.right_head_latch.set_homed_or_released_handler(self._latches_homed_or_released_handler)
+        self.right_head_latch.set_released_handler(self._latches_released_handler)
 
         self.left_head_latch = Latch()
         self.left_head_latch.set_stepper(self._phidgets['left_head_latch_motor'])
         self.left_head_latch.set_home_switch(self._phidgets['left_head_latch_home_switch'])
-        self.left_head_latch.set_homed_or_released_handler(self._latches_homed_or_released_handler)
+        self.left_head_latch.set_released_handler(self._latches_released_handler)
 
-        self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._dummy_switch_handler)
-        # self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._head_bar_switch_handler)
+        self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._head_bar_switch_handler)
         self._phidgets['release_switch'].setOnStateChangeHandler(self._release_switch_handler)
+
+        self._setup_timer = Timer(self._SETUP_PERIOD,self._setup)
+        self._setup_timer.start()
+
+        self._initialized = True
 
     def _phidget_attached(self,phidget):
         if phidget.configuration['channel_class'] == 'Stepper':
@@ -215,8 +223,6 @@ class HeadFixationController():
             self._debug_print('yes voltage thingy!')
         elif phidget.configuration['channel_class'] == 'DigitalInput':
             self._debug_print('yes digital input thingy!')
-        if self._all_attached():
-            self._all_attached_handler()
 
     def _all_attached(self):
         for phidget in self._phidgets.values():
@@ -224,31 +230,40 @@ class HeadFixationController():
                 return False
         return True
 
-    def _all_attached_handler(self):
-        print('all attached!!')
-
     def _debug_print(self, *args):
         if self.debug:
             print(*args)
+
+    def _setup(self):
+        if self._initialized and self._all_attached():
+            self.home_latches()
+        else:
+            self._setup_timer = Timer(self._SETUP_PERIOD,self._setup)
+            self._setup_timer.start()
 
     def _dummy_switch_handler(self,phidget,state):
         pass
 
     def _head_bar_switch_handler(self,phidget,state):
         if state == self._HEAD_BAR_SWITCH_ACTIVE:
+            self._debug_print('head bar switch activated')
             self.close_latches()
 
     def _release_switch_handler(self,phidget,state):
         if state == self._HEAD_BAR_SWITCH_ACTIVE:
+            self._debug_print('release switch activated')
             self.release_latches()
 
-    def _latches_homed_or_released_handler(self):
-        if self.right_head_latch.homed_or_released() and self.left_head_latch.homed_or_released():
-            self._debug_print('both latched homed or released!!')
+    def _latches_released(self):
+        return self.right_head_latch.released() and self.left_head_latch.released()
+
+    def _latches_released_handler(self):
+        if self._latches_released():
+            self._debug_print('both latches released')
             self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._head_bar_switch_handler)
 
     def home_latches(self):
-        self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._dummy_switch_handler)
+        self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._head_bar_switch_handler)
         self.right_head_latch.home()
         self.left_head_latch.home()
 
@@ -257,7 +272,8 @@ class HeadFixationController():
         self.left_head_latch.close()
 
     def release_latches(self):
-        self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._dummy_switch_handler)
+        if self.right_head_latch.homed() and self.left_head_latch.homed():
+            self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._dummy_switch_handler)
         self.right_head_latch.release()
         self.left_head_latch.release()
 
