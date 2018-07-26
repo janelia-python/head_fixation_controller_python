@@ -8,10 +8,10 @@
     "close_position" : -1150,
     "release_position" : -10,
     "home_velocity" : 400,
-    "acceleration" : 250000,
+    "acceleration" : 64000,
     "current_limit" : 0.5,
     "holding_current_limit" : 0.5,
-    "velocity_limit" : 115000
+    "velocity_limit" : 64000
   },
   "right_head_latch_home_switch" : {
     "label" : "SWITCH 0",
@@ -29,10 +29,10 @@
     "close_position" : 1150,
     "release_position" : 10,
     "home_velocity" : -400,
-    "acceleration" : 250000,
+    "acceleration" : 64000,
     "current_limit" : 0.5,
     "holding_current_limit" : 0.5,
-    "velocity_limit" : 115000
+    "velocity_limit" : 64000
   },
   "left_head_latch_home_switch" : {
     "label" : "SWITCH 1",
@@ -53,7 +53,10 @@
     "channel_class" : "VoltageRatioInput",
     "device_serial_number" : 514010,
     "hub_port" : 5,
-    "channel" : 0
+    "channel" : 0,
+    "bridge_gain" : 8,
+    "data_interval" : 250,
+    "voltage_ratio_change_trigger" : 0.00005
   },
   "release_switch" : {
     "label" : "SWITCH 3",

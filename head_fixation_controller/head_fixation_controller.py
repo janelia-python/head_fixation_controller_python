@@ -154,6 +154,7 @@ class HeadFixationController():
     _HEAD_BAR_SWITCH_ACTIVE = 1
     _RELEASE_SWITCH_ACTIVE = 1
     _SETUP_PERIOD = 1.0
+    _HEAD_BAR_SWITCH_RESET_DELAY = 2.0
 
     def __init__(self,*args,**kwargs):
         self._initialized = False
@@ -202,6 +203,8 @@ class HeadFixationController():
         self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._head_bar_switch_handler)
         self._phidgets['release_switch'].setOnStateChangeHandler(self._release_switch_handler)
 
+        self._phidgets['floor_force_sensor'].setOnVoltageRatioChangeHandler(self._floor_force_sensor_handler)
+
         self._setup_timer = Timer(self._SETUP_PERIOD,self._setup)
         self._setup_timer.start()
 
@@ -220,9 +223,14 @@ class HeadFixationController():
             phidget.setVelocityLimit(phidget.configuration['velocity_limit'])
             self._debug_print(phidget.name,' velocity_limit: ',phidget.getVelocityLimit())
         elif phidget.configuration['channel_class'] == 'VoltageRatioInput':
-            self._debug_print('yes voltage thingy!')
+            phidget.setBridgeGain(phidget.configuration['bridge_gain'])
+            self._debug_print('bridge_gain: ', phidget.getBridgeGain())
+            phidget.setDataInterval(phidget.configuration['data_interval'])
+            self._debug_print('data_interval: ', phidget.getDataInterval())
+            phidget.setVoltageRatioChangeTrigger(phidget.configuration['voltage_ratio_change_trigger'])
+            self._debug_print('voltage_ratio_change_trigger: ', phidget.getVoltageRatioChangeTrigger())
         elif phidget.configuration['channel_class'] == 'DigitalInput':
-            self._debug_print('yes digital input thingy!')
+            pass
 
     def _all_attached(self):
         for phidget in self._phidgets.values():
@@ -254,13 +262,20 @@ class HeadFixationController():
             self._debug_print('release switch activated')
             self.release_latches()
 
+    def _floor_force_sensor_handler(self,phidget,voltage_ratio):
+        print('voltage ratio: ',voltage_ratio)
+
     def _latches_released(self):
         return self.right_head_latch.released() and self.left_head_latch.released()
 
     def _latches_released_handler(self):
         if self._latches_released():
             self._debug_print('both latches released')
-            self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._head_bar_switch_handler)
+            self._head_bar_switch_reset_timer = Timer(self._HEAD_BAR_SWITCH_RESET_DELAY,self._reset_head_bar_switch_handler)
+            self._head_bar_switch_reset_timer.start()
+
+    def _reset_head_bar_switch_handler(self):
+        self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._head_bar_switch_handler)
 
     def home_latches(self):
         self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._head_bar_switch_handler)
@@ -268,6 +283,7 @@ class HeadFixationController():
         self.left_head_latch.home()
 
     def close_latches(self):
+        self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._dummy_switch_handler)
         self.right_head_latch.close()
         self.left_head_latch.close()
 
