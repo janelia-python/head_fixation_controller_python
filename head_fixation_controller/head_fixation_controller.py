@@ -162,6 +162,10 @@ class HeadFixationController():
             self.debug = kwargs['debug']
         else:
             self.debug = DEBUG
+        try:
+            self._latches_enabled = kwargs['latches_enabled']
+        except KeyError:
+            self._latches_enabled = True
 
         module_dir = os.path.split(__file__)[0]
         phidgets_configuration_path = os.path.join(module_dir,self._PHIDGETS_CONFIGURATION_FILENAME)
@@ -235,6 +239,7 @@ class HeadFixationController():
     def _all_attached(self):
         for phidget in self._phidgets.values():
             if not phidget.getAttached():
+                self._debug_print(phidget.name,' not attached!')
                 return False
         return True
 
@@ -243,7 +248,9 @@ class HeadFixationController():
             print(*args)
 
     def _setup(self):
+        self._debug_print('setup timer expired.')
         if self._initialized and self._all_attached():
+            self._debug_print('setup!')
             self.home_latches()
         else:
             self._setup_timer = Timer(self._SETUP_PERIOD,self._setup)
@@ -254,6 +261,7 @@ class HeadFixationController():
 
     def _head_bar_switch_handler(self,phidget,state):
         if state == self._HEAD_BAR_SWITCH_ACTIVE:
+            print('head bar switch activated')
             self._debug_print('head bar switch activated')
             self.close_latches()
 
@@ -277,17 +285,29 @@ class HeadFixationController():
     def _reset_head_bar_switch_handler(self):
         self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._head_bar_switch_handler)
 
+    def enable_latches(self):
+        self._latches_enabled = True
+
+    def disable_latches(self):
+        self._latches_enabled = False
+
     def home_latches(self):
+        if not self._latches_enabled:
+            return
         self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._head_bar_switch_handler)
         self.right_head_latch.home()
         self.left_head_latch.home()
 
     def close_latches(self):
+        if not self._latches_enabled:
+            return
         self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._dummy_switch_handler)
         self.right_head_latch.close()
         self.left_head_latch.close()
 
     def release_latches(self):
+        if not self._latches_enabled:
+            return
         if self.right_head_latch.homed() and self.left_head_latch.homed():
             self._phidgets['head_bar_switch'].setOnStateChangeHandler(self._dummy_switch_handler)
         self.right_head_latch.release()
@@ -298,4 +318,6 @@ class HeadFixationController():
 if __name__ == '__main__':
 
     debug = False
-    dev = HeadFixationController(debug=debug)
+    latches_enabled = True
+    dev = HeadFixationController(debug=debug,
+                                 latches_enabled=latches_enabled)
