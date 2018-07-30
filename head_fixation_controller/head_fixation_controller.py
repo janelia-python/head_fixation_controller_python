@@ -1,12 +1,17 @@
-import json
 from Phidget22.PhidgetException import *
 from Phidget22.Phidget import *
 from Phidget22.Net import *
 from Phidget22.Devices.Stepper import *
 from Phidget22.Devices.DigitalInput import *
 from Phidget22.Devices.VoltageRatioInput import *
+from Phidget22.Devices.Log import *
+from Phidget22.LogLevel import *
+
 import os
+import json
 from threading import Timer
+import time
+from datetime import datetime
 
 try:
     from pkg_resources import get_distribution, DistributionNotFound
@@ -167,6 +172,15 @@ class HeadFixationController():
         except KeyError:
             self._latches_enabled = True
 
+        try:
+            log_base_directory = os.path.expanduser('~/logs')
+            log_directory = os.path.join(log_base_directory,self._get_date_time_str())
+            os.makedirs(log_directory)
+            log_path = os.path.join(log_directory,'log.txt')
+            Log.enable(LogLevel.PHIDGET_LOG_INFO,log_path)
+        except PhidgetException as e:
+            print("Phidget Exception %i: %s" % (e.code, e.details))
+
         module_dir = os.path.split(__file__)[0]
         phidgets_configuration_path = os.path.join(module_dir,self._PHIDGETS_CONFIGURATION_FILENAME)
 
@@ -210,7 +224,7 @@ class HeadFixationController():
         self._phidgets['floor_force_sensor'].setOnVoltageRatioChangeHandler(self._floor_force_sensor_handler)
 
         self._setup_timer = Timer(self._SETUP_PERIOD,self._setup)
-        self._setup_timer.start()
+        # self._setup_timer.start()
 
         self._initialized = True
 
@@ -246,6 +260,17 @@ class HeadFixationController():
     def _debug_print(self, *args):
         if self.debug:
             print(*args)
+
+    def _get_date_time_str(self,timestamp=None):
+        if timestamp is None:
+            d = datetime.fromtimestamp(time.time())
+        elif timestamp == 0:
+            date_time_str = 'NULL'
+            return date_time_str
+        else:
+            d = datetime.fromtimestamp(timestamp)
+        date_time_str = d.strftime('%Y-%m-%d-%H-%M-%S')
+        return date_time_str
 
     def _setup(self):
         self._debug_print('setup timer expired.')
