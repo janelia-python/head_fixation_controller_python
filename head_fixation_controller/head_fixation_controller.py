@@ -155,7 +155,7 @@ class HeadFixationController():
     dev = HeadFixationController() # Might automatically find devices if available
     '''
 
-    _PHIDGETS_CONFIGURATION_FILENAME = 'phidgets.json'
+    _CONFIGURATION_FILENAME = 'configuration.json'
     _HEAD_BAR_SWITCH_ACTIVE = 1
     _RELEASE_SWITCH_ACTIVE = 1
     _SETUP_PERIOD = 1.0
@@ -172,6 +172,7 @@ class HeadFixationController():
         except KeyError:
             self._latches_enabled = True
 
+
         try:
             log_base_directory = os.path.expanduser('~/logs')
             log_directory = os.path.join(log_base_directory,self._get_date_time_str())
@@ -182,7 +183,7 @@ class HeadFixationController():
             print("Phidget Exception %i: %s" % (e.code, e.details))
 
         module_dir = os.path.split(__file__)[0]
-        phidgets_configuration_path = os.path.join(module_dir,self._PHIDGETS_CONFIGURATION_FILENAME)
+        phidgets_configuration_path = os.path.join(module_dir,self._CONFIGURATION_FILENAME)
 
         with open(phidgets_configuration_path) as f:
             phidgets_configuration_json = f.read()
