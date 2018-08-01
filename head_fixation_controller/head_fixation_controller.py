@@ -8,7 +8,7 @@ from Phidget22.Devices.Log import *
 from Phidget22.LogLevel import *
 
 import os
-import json
+import yaml
 from threading import Timer
 import time
 from datetime import datetime
@@ -155,7 +155,7 @@ class HeadFixationController():
     dev = HeadFixationController() # Might automatically find devices if available
     '''
 
-    _CONFIGURATION_FILENAME = 'configuration.json'
+    _CONFIGURATION_FILENAME = 'configuration.yaml'
     _HEAD_BAR_SWITCH_ACTIVE = 1
     _RELEASE_SWITCH_ACTIVE = 1
     _SETUP_PERIOD = 1.0
@@ -186,9 +186,9 @@ class HeadFixationController():
         phidgets_configuration_path = os.path.join(module_dir,self._CONFIGURATION_FILENAME)
 
         with open(phidgets_configuration_path) as f:
-            phidgets_configuration_json = f.read()
+            phidgets_configuration_yaml = f.read()
 
-        phidgets_configuration = json.loads(phidgets_configuration_json)
+        phidgets_configuration = yaml.load(phidgets_configuration_yaml)
 
         self._phidgets = {}
         for name, phidget_configuration in phidgets_configuration.items():
