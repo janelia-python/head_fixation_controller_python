@@ -30,9 +30,10 @@
     git clone https://github.com/janelia-pypi/head_fixation_controller_python.git
   #+END_SRC
 
-** Update Phidgets Configuration File
+** Update Configuration File
 
-   Update phidget device_serial_numbers in "head_fixation_controller/phidgets.json" file.
+   Update information in "configuration.yaml" file, in particular, the phidget
+   device_serial_numbers.
 
 * Hardware
 
