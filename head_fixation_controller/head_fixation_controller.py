@@ -152,16 +152,19 @@ class HeadFixationController():
 
     Example Usage:
 
-    dev = HeadFixationController() # Might automatically find devices if available
+    configuration_path = '/media/usb0/configuration.yaml'
+    dev = HeadFixationController(configuration_path)
     '''
 
-    _CONFIGURATION_FILENAME = 'configuration.yaml'
     _HEAD_BAR_SWITCH_ACTIVE = 1
     _RELEASE_SWITCH_ACTIVE = 1
     _SETUP_PERIOD = 1.0
     _HEAD_BAR_SWITCH_RESET_DELAY = 2.0
 
-    def __init__(self,*args,**kwargs):
+    def __init__(self,
+                 configuration_path,
+                 *args,
+                 **kwargs):
         self._initialized = False
         if 'debug' in kwargs:
             self.debug = kwargs['debug']
@@ -172,6 +175,10 @@ class HeadFixationController():
         except KeyError:
             self._latches_enabled = True
 
+        with open(configuration_path) as f:
+            configuration_yaml = f.read()
+
+        configuration = yaml.load(configuration_yaml)
 
         try:
             log_base_directory = os.path.expanduser('~/logs')
@@ -182,16 +189,8 @@ class HeadFixationController():
         except PhidgetException as e:
             print("Phidget Exception %i: %s" % (e.code, e.details))
 
-        module_dir = os.path.split(__file__)[0]
-        phidgets_configuration_path = os.path.join(module_dir,self._CONFIGURATION_FILENAME)
-
-        with open(phidgets_configuration_path) as f:
-            phidgets_configuration_yaml = f.read()
-
-        phidgets_configuration = yaml.load(phidgets_configuration_yaml)
-
         self._phidgets = {}
-        for name, phidget_configuration in phidgets_configuration.items():
+        for name, phidget_configuration in configuration['phidgets'].items():
             if (phidget_configuration['channel_class'] == 'DigitalInput'):
                 self._phidgets.update({name : DigitalInput()})
                 self._phidgets[name].setIsHubPortDevice(True)
