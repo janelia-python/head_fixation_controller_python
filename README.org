@@ -3,8 +3,12 @@
 #+EMAIL: peterpolidoro@gmail.com
 
 * Package Information
-  - Author :: Peter Polidoro
+  - Name :: head_fixation_controller_python
+  - Version :: 0.0.1
   - License :: BSD
+  - URL :: https://github.com/janelia-pypi/head_fixation_controller_python
+  - Author :: Peter Polidoro
+  - Email :: peterpolidoro@gmail.com
 
   This Python package (head_fixation_controller) creates a class named
   HeadFixationController.
