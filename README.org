@@ -6,7 +6,7 @@
   - Name :: head_fixation_controller_python
   - Version :: 0.0.1
   - License :: BSD
-  - URL :: https://github.com/janelia-pypi/head_fixation_controller_python
+  - URL :: https://github.com/janelia-python/head_fixation_controller_python
   - Author :: Peter Polidoro
   - Email :: peter@polidoro.io
 
@@ -31,7 +31,7 @@
   #+BEGIN_SRC sh
     mkdir ~/git
     cd ~/git
-    git clone https://github.com/janelia-pypi/head_fixation_controller_python.git
+    git clone https://github.com/janelia-python/head_fixation_controller_python.git
   #+END_SRC
 
 ** Update Configuration File

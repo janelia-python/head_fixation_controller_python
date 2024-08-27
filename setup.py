@@ -21,7 +21,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/janelia-pypi/head_fixation_controller_python',
+    url='https://github.com/janelia-python/head_fixation_controller_python',
 
     # Author details
     author='Peter Polidoro',
